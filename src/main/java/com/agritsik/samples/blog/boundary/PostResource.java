@@ -1,59 +1,48 @@
 package com.agritsik.samples.blog.boundary;
 
 import com.agritsik.samples.blog.entity.Post;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.ejb.EJB;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
-@Component
-@Path("/posts")
+@RestController
+@RequestMapping(value = "/resources/posts")
 public class PostResource {
 
-    @Context
-    UriInfo uriInfo;
-
-    @EJB
+    @Autowired
     PostService postService;
 
-    @POST
-    public Response create(Post post){
+    @RequestMapping(method = RequestMethod.POST)
+    public ResponseEntity<Void> create(@RequestBody Post post) throws URISyntaxException {
         postService.create(post);
-
-        URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(post.getId())).build();
-        return Response.created(uri).build();
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(post.getId()).toUri();
+        return ResponseEntity.created(uri).build();
     }
 
-    @GET
-    @Path("{id}")
-    public Post find(@PathParam("id") long id){
+    @RequestMapping(value = "{id}", method = RequestMethod.GET)
+    public Post find(@PathVariable long id) {
         return postService.find(id);
     }
 
-
-    @GET
-    public List<Post> find(@QueryParam("first") int first, @QueryParam("maxResult") int maxResult){
+    @RequestMapping(method = RequestMethod.GET)
+    public List<Post> find(@RequestParam(name = "start") Integer first, @RequestParam(name = "maxResult") Integer maxResult) {
         return postService.find(first, maxResult);
     }
 
-
-    @PUT
-    @Path("{id}")
-    public Response update(@PathParam("id") long id, Post post){
+    @RequestMapping(value = "{id}", method = RequestMethod.PUT)
+    public ResponseEntity<Void> update(@PathVariable long id, @RequestBody Post post) {
         postService.update(post);
-        return Response.status(Response.Status.NO_CONTENT).build();
+        return ResponseEntity.noContent().build();
     }
 
-    @DELETE
-    @Path("{id}")
-    public Response delete(@PathParam("id") long id){
+    @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Void> delete(@PathVariable long id) {
         postService.delete(id);
-        return Response.status(Response.Status.NO_CONTENT).build();
+        return ResponseEntity.noContent().build();
     }
-
 }
