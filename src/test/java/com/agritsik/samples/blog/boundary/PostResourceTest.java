@@ -4,22 +4,18 @@ import com.agritsik.samples.blog.Application;
 import com.agritsik.samples.blog.TestContext;
 import com.agritsik.samples.blog.entity.Post;
 import junit.framework.TestCase;
-import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -30,19 +26,12 @@ import java.util.logging.Logger;
 public class PostResourceTest extends TestCase {
 
     private static final Logger LOGGER = Logger.getLogger(PostResourceTest.class.getName());
+
+    public static final String URL = "http://localhost:8080/resources/posts/";
     public static final String TITLE = "My new post via REST!";
     public static final String TITLE_EDITED = "My edited post via REST!";
 
-
-    private Client client;
-    private WebTarget postsTarget;
-
-
-    @Before
-    public void setUp() throws Exception {
-        this.client = ClientBuilder.newClient();
-        this.postsTarget = client.target("http://localhost:8080").path("/resources/posts");
-    }
+    TestRestTemplate template = new TestRestTemplate();
 
     @Test
     public void test1Create() throws Exception {
@@ -51,20 +40,21 @@ public class PostResourceTest extends TestCase {
         Post post = new Post();
         post.setTitle(TITLE);
 
-        Response response = this.postsTarget.request(MediaType.APPLICATION_JSON).post(Entity.json(post));
+        ResponseEntity<Void> response = template.postForEntity(URL, post, Void.class);
 
         // check result
-        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-        assertNotNull(response.getLocation());
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getHeaders().getLocation());
 
-        TestContext.createdURL = response.getLocation();
+        TestContext.createdURL = response.getHeaders().getLocation();
     }
+
 
     @Test
     public void test2Find() throws Exception {
 
         // try to find post by location
-        Post post = this.client.target(TestContext.createdURL).request(MediaType.APPLICATION_JSON).get(Post.class);
+        Post post = template.getForEntity(TestContext.createdURL, Post.class).getBody();
 
         System.out.println(post);
         assertNotNull(post);
@@ -75,17 +65,16 @@ public class PostResourceTest extends TestCase {
     public void test3Update() throws Exception {
 
         // find post by location
-        Post post = this.client.target(TestContext.createdURL).request(MediaType.APPLICATION_JSON).get(Post.class);
+        Post post = template.getForEntity(TestContext.createdURL, Post.class).getBody();
         post.setTitle(TITLE_EDITED);
 
         // try to update post
-        Response response = this.postsTarget.path(String.valueOf(post.getId()))
-                .request(MediaType.APPLICATION_JSON).put(Entity.json(post));
+        template.put(TestContext.createdURL, post);
 
-        // check result
-        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+        // check result // todo: how to check void methods?
+//        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
 
-        Post updatedPost = client.target(TestContext.createdURL).request(MediaType.APPLICATION_JSON).get(Post.class);
+        Post updatedPost = template.getForEntity(TestContext.createdURL, Post.class).getBody();
         assertEquals(TITLE_EDITED, updatedPost.getTitle());
 
     }
@@ -94,11 +83,11 @@ public class PostResourceTest extends TestCase {
     public void test4Delete() throws Exception {
 
         // try to delete post
-        Response response = client.target(TestContext.createdURL).request(MediaType.APPLICATION_JSON).delete();
+        template.delete(TestContext.createdURL);
 
-        // check result
-        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
-        Post deletedPost = client.target(TestContext.createdURL).request(MediaType.APPLICATION_JSON).get(Post.class);
+        // check result // todo: how to check void methods?
+//        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+        Post deletedPost = template.getForEntity(TestContext.createdURL, Post.class).getBody();
 
         assertNull(deletedPost);
 
@@ -112,12 +101,13 @@ public class PostResourceTest extends TestCase {
         for (int i = 0; i < 85; i++) {
             Post post = new Post();
             post.setTitle("Another post #" + i);
-            this.postsTarget.request(MediaType.APPLICATION_JSON).post(Entity.json(post));
+            template.postForEntity(URL, post, Void.class);
         }
 
         // try to find posts
-        List<Post> posts = this.postsTarget.queryParam("start", 0).queryParam("maxResult", 10)
-                .request(MediaType.APPLICATION_JSON).get(new GenericType<List<Post>>() {});
+        ResponseEntity<Post[]> entity = template.getForEntity(URL+"?start={start}&maxResult={max}",
+                Post[].class, 0, 10);
+        List<Post> posts = Arrays.asList(entity.getBody());
 
         // check result
         assertEquals(10, posts.size());

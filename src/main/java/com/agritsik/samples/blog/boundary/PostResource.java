@@ -30,7 +30,7 @@ public class PostResource {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public List<Post> find(@RequestParam(name = "start") Integer first, @RequestParam(name = "maxResult") Integer maxResult) {
+    public List<Post> find(@RequestParam("start") Integer first, @RequestParam("maxResult") Integer maxResult) {
         return postService.find(first, maxResult);
     }
 
