@@ -19,6 +19,7 @@ public class PostResource {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Void> create(@RequestBody Post post) throws URISyntaxException {
+        System.out.println("Resource creates...");
         postService.create(post);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(post.getId()).toUri();
         return ResponseEntity.created(uri).build();

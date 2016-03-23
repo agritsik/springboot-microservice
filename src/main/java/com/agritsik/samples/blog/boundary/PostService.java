@@ -16,6 +16,8 @@ public class PostService {
     EntityManager entityManager;
 
     public void create(Post post){
+
+        System.out.println("Service creates...");
         entityManager.persist(post);
     }
 
