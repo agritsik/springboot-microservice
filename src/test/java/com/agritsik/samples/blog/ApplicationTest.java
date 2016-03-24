@@ -1,5 +1,6 @@
 package com.agritsik.samples.blog;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.boot.SpringApplication;
 
@@ -8,6 +9,7 @@ import static org.mockito.Mockito.verify;
 
 public class ApplicationTest {
 
+    @Ignore
     @Test
     public void testMain() throws Exception {
 

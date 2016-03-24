@@ -18,6 +18,13 @@ public class Post {
 
     private String title;
 
+    public Post() {
+    }
+
+    public Post(String title) {
+        this.title = title;
+    }
+
     public String getTitle() {
         return title;
     }

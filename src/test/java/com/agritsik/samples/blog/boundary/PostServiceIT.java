@@ -20,7 +20,7 @@ import static org.junit.Assert.assertNull;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(Application.class)
-public class PostServiceTest {
+public class PostServiceIT {
 
     public static final String TITLE = "My first post!";
     public static final String TITLE_EDITED = "My edited first post!";
