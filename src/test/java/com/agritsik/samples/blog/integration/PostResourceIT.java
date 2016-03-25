@@ -1,7 +1,6 @@
-package com.agritsik.samples.blog.boundary;
+package com.agritsik.samples.blog.integration;
 
 import com.agritsik.samples.blog.Application;
-import com.agritsik.samples.blog.TestContext;
 import com.agritsik.samples.blog.entity.Post;
 import junit.framework.TestCase;
 import org.junit.FixMethodOrder;

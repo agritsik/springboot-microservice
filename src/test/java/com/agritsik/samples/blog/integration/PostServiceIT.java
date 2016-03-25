@@ -1,21 +1,22 @@
-package com.agritsik.samples.blog.boundary;
+package com.agritsik.samples.blog.integration;
 
 import com.agritsik.samples.blog.Application;
-import com.agritsik.samples.blog.TestContext;
+import com.agritsik.samples.blog.boundary.PostService;
 import com.agritsik.samples.blog.entity.Post;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -29,14 +30,33 @@ public class PostServiceIT {
     @Autowired
     PostService postService;
 
+    @Autowired
+    RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    RabbitAdmin rabbitAdmin;
+
+    @Before
+    public void setUp() throws Exception {
+        rabbitAdmin.purgeQueue(Application.QUEUE_NAME, true);
+    }
+
     @Test
     public void test1Create() throws Exception {
+
+        // arrange
         Post post = new Post();
         post.setTitle(TITLE);
+
+        // act
         postService.create(post);
 
+        // assert
         assertNotNull(post.getId());
         TestContext.createdId = post.getId();
+
+        Object r = rabbitTemplate.receiveAndConvert(Application.QUEUE_NAME);
+        assertEquals(TITLE, r.toString());
 
     }
 

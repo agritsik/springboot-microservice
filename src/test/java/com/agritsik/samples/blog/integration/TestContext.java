@@ -1,4 +1,4 @@
-package com.agritsik.samples.blog;
+package com.agritsik.samples.blog.integration;
 
 import java.net.URI;
 
