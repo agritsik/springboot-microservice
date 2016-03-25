@@ -37,6 +37,7 @@ public class PostServiceIT {
 
         assertNotNull(post.getId());
         TestContext.createdId = post.getId();
+
     }
 
     @Test
