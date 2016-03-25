@@ -16,6 +16,11 @@ public class Post {
     public Post() {
     }
 
+    public Post(long id, String title) {
+        this.id = id;
+        this.title = title;
+    }
+
     public Post(String title) {
         this.title = title;
     }

@@ -1,13 +1,13 @@
-package com.agritsik.samples.blog.integration;
+package e2e;
 
 import com.agritsik.samples.blog.Application;
+import com.agritsik.samples.blog.TestContext;
 import com.agritsik.samples.blog.entity.Post;
 import junit.framework.TestCase;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.boot.test.WebIntegrationTest;
@@ -23,12 +23,9 @@ import java.util.logging.Logger;
 @SpringApplicationConfiguration(Application.class)
 @WebIntegrationTest
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class PostResourceIT extends TestCase {
+public class PostE2E extends TestCase {
 
-    @Autowired
-    TestContext testContext;
-
-    private static final Logger LOGGER = Logger.getLogger(PostResourceIT.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PostE2E.class.getName());
 
     public static final String URL = "http://localhost:8080/resources/posts/";
     public static final String TITLE = "My new post via REST!";
@@ -49,7 +46,7 @@ public class PostResourceIT extends TestCase {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getHeaders().getLocation());
 
-        testContext.setCreatedURL(response.getHeaders().getLocation());
+        TestContext.createdURL = response.getHeaders().getLocation();
     }
 
 
@@ -57,7 +54,7 @@ public class PostResourceIT extends TestCase {
     public void test2Find() throws Exception {
 
         // try to find post by location
-        Post post = template.getForEntity(testContext.getCreatedURL(), Post.class).getBody();
+        Post post = template.getForEntity(TestContext.createdURL, Post.class).getBody();
 
         System.out.println(post);
         assertNotNull(post);
@@ -68,16 +65,16 @@ public class PostResourceIT extends TestCase {
     public void test3Update() throws Exception {
 
         // find post by location
-        Post post = template.getForEntity(testContext.getCreatedURL(), Post.class).getBody();
+        Post post = template.getForEntity(TestContext.createdURL, Post.class).getBody();
         post.setTitle(TITLE_EDITED);
 
         // try to update post
-        template.put(testContext.getCreatedURL(), post);
+        template.put(TestContext.createdURL, post);
 
         // check result // todo: how to check void methods?
 //        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
 
-        Post updatedPost = template.getForEntity(testContext.getCreatedURL(), Post.class).getBody();
+        Post updatedPost = template.getForEntity(TestContext.createdURL, Post.class).getBody();
         assertEquals(TITLE_EDITED, updatedPost.getTitle());
 
     }
@@ -86,11 +83,11 @@ public class PostResourceIT extends TestCase {
     public void test4Delete() throws Exception {
 
         // try to delete post
-        template.delete(testContext.getCreatedURL());
+        template.delete(TestContext.createdURL);
 
         // check result // todo: how to check void methods?
 //        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
-        Post deletedPost = template.getForEntity(testContext.getCreatedURL(), Post.class).getBody();
+        Post deletedPost = template.getForEntity(TestContext.createdURL, Post.class).getBody();
 
         assertNull(deletedPost);
 
