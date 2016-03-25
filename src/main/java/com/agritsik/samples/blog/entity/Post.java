@@ -5,12 +5,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "posts")
-@NamedQueries({
-        @NamedQuery(name = Post.FIND_ALL, query = "SELECT p FROM Post p")
-})
 public class Post {
-
-    public static final String FIND_ALL = "Post.findAll";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

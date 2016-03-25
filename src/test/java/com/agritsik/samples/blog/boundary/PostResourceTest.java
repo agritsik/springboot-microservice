@@ -1,5 +1,6 @@
 package com.agritsik.samples.blog.boundary;
 
+import com.agritsik.samples.blog.control.PostAction;
 import com.agritsik.samples.blog.entity.Post;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
@@ -32,7 +33,7 @@ public class PostResourceTest {
     PostResource postResource;
 
     @Mock
-    PostService postService;
+    PostAction postAction;
 
     @Before
     public void setUp() throws Exception {
@@ -54,13 +55,13 @@ public class PostResourceTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().string(""));
 
-        verify(postService).create(any(Post.class));
+        verify(postAction).create(any(Post.class));
     }
 
     @Test
     public void testFind() throws Exception {
         // arrange
-        when(postService.find(anyLong())).thenReturn(new Post("2nd"));
+        when(postAction.find(anyLong())).thenReturn(new Post("2nd"));
 
         // act && assert
         this.mvc.perform(get("/resources/posts/1"))
@@ -68,6 +69,6 @@ public class PostResourceTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().string(containsString("2nd")));
 
-        verify(postService).find(anyLong());
+        verify(postAction).find(anyLong());
     }
 }

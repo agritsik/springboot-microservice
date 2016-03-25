@@ -7,6 +7,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.boot.test.WebIntegrationTest;
@@ -23,6 +24,9 @@ import java.util.logging.Logger;
 @WebIntegrationTest
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class PostResourceIT extends TestCase {
+
+    @Autowired
+    TestContext testContext;
 
     private static final Logger LOGGER = Logger.getLogger(PostResourceIT.class.getName());
 
@@ -45,7 +49,7 @@ public class PostResourceIT extends TestCase {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getHeaders().getLocation());
 
-        TestContext.createdURL = response.getHeaders().getLocation();
+        testContext.setCreatedURL(response.getHeaders().getLocation());
     }
 
 
@@ -53,7 +57,7 @@ public class PostResourceIT extends TestCase {
     public void test2Find() throws Exception {
 
         // try to find post by location
-        Post post = template.getForEntity(TestContext.createdURL, Post.class).getBody();
+        Post post = template.getForEntity(testContext.getCreatedURL(), Post.class).getBody();
 
         System.out.println(post);
         assertNotNull(post);
@@ -64,16 +68,16 @@ public class PostResourceIT extends TestCase {
     public void test3Update() throws Exception {
 
         // find post by location
-        Post post = template.getForEntity(TestContext.createdURL, Post.class).getBody();
+        Post post = template.getForEntity(testContext.getCreatedURL(), Post.class).getBody();
         post.setTitle(TITLE_EDITED);
 
         // try to update post
-        template.put(TestContext.createdURL, post);
+        template.put(testContext.getCreatedURL(), post);
 
         // check result // todo: how to check void methods?
 //        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
 
-        Post updatedPost = template.getForEntity(TestContext.createdURL, Post.class).getBody();
+        Post updatedPost = template.getForEntity(testContext.getCreatedURL(), Post.class).getBody();
         assertEquals(TITLE_EDITED, updatedPost.getTitle());
 
     }
@@ -82,11 +86,11 @@ public class PostResourceIT extends TestCase {
     public void test4Delete() throws Exception {
 
         // try to delete post
-        template.delete(TestContext.createdURL);
+        template.delete(testContext.getCreatedURL());
 
         // check result // todo: how to check void methods?
 //        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
-        Post deletedPost = template.getForEntity(TestContext.createdURL, Post.class).getBody();
+        Post deletedPost = template.getForEntity(testContext.getCreatedURL(), Post.class).getBody();
 
         assertNull(deletedPost);
 
@@ -104,7 +108,7 @@ public class PostResourceIT extends TestCase {
         }
 
         // try to find posts
-        ResponseEntity<Post[]> entity = template.getForEntity(URL+"?start={start}&maxResult={max}",
+        ResponseEntity<Post[]> entity = template.getForEntity(URL + "?start={start}&maxResult={max}",
                 Post[].class, 0, 10);
         List<Post> posts = Arrays.asList(entity.getBody());
 

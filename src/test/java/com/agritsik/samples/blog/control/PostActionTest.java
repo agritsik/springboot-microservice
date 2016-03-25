@@ -1,6 +1,7 @@
-package com.agritsik.samples.blog.boundary;
+package com.agritsik.samples.blog.control;
 
 import com.agritsik.samples.blog.Application;
+import com.agritsik.samples.blog.boundary.PostRepository;
 import com.agritsik.samples.blog.entity.Post;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,19 +10,17 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
-import javax.persistence.EntityManager;
-
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
-public class PostServiceTest {
+public class PostActionTest {
 
 
     @InjectMocks
-    PostService postService;
+    PostAction postAction;
 
     @Mock
-    EntityManager entityManager;
+    PostRepository postRepository;
 
     @Mock
     RabbitTemplate rabbitTemplate;
@@ -33,11 +32,13 @@ public class PostServiceTest {
         Post post = new Post("1st");
 
         // act
-        postService.create(post);
+        postAction.create(post);
 
         // assert
-        verify(entityManager).persist(post);
+        verify(postRepository).save(post);
         verify(rabbitTemplate).convertAndSend(Application.QUEUE_NAME, post.getTitle());
 
     }
+
+
 }

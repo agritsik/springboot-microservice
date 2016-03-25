@@ -1,7 +1,7 @@
 package com.agritsik.samples.blog.integration;
 
 import com.agritsik.samples.blog.Application;
-import com.agritsik.samples.blog.boundary.PostService;
+import com.agritsik.samples.blog.control.PostAction;
 import com.agritsik.samples.blog.entity.Post;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -12,9 +12,8 @@ import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.data.domain.Page;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -28,7 +27,10 @@ public class PostServiceIT {
 
 
     @Autowired
-    PostService postService;
+    TestContext testContext;
+
+    @Autowired
+    PostAction postAction;
 
     @Autowired
     RabbitTemplate rabbitTemplate;
@@ -49,11 +51,11 @@ public class PostServiceIT {
         post.setTitle(TITLE);
 
         // act
-        postService.create(post);
+        postAction.create(post);
 
         // assert
         assertNotNull(post.getId());
-        TestContext.createdId = post.getId();
+        testContext.setCreatedId(post.getId());
 
         Object r = rabbitTemplate.receiveAndConvert(Application.QUEUE_NAME);
         assertEquals(TITLE, r.toString());
@@ -62,7 +64,7 @@ public class PostServiceIT {
 
     @Test
     public void test2Find() throws Exception {
-        Post post = postService.find(TestContext.createdId);
+        Post post = postAction.find(testContext.getCreatedId());
         assertNotNull(post);
         assertEquals(TITLE, post.getTitle());
     }
@@ -71,11 +73,11 @@ public class PostServiceIT {
     @Test
     public void test3Update() throws Exception {
 
-        Post post = postService.find(TestContext.createdId);
+        Post post = postAction.find(testContext.getCreatedId());
         post.setTitle(TITLE_EDITED);
-        postService.update(post);
+        postAction.update(post);
 
-        Post updatedPost = postService.find(TestContext.createdId);
+        Post updatedPost = postAction.find(testContext.getCreatedId());
 
         assertEquals(TITLE_EDITED, updatedPost.getTitle());
 
@@ -83,9 +85,9 @@ public class PostServiceIT {
 
     @Test
     public void test4Remove() throws Exception {
-        postService.delete(TestContext.createdId);
+        postAction.delete(testContext.getCreatedId());
 
-        Post post = postService.find(TestContext.createdId);
+        Post post = postAction.find(testContext.getCreatedId());
         assertNull(post);
     }
 
@@ -96,21 +98,20 @@ public class PostServiceIT {
         for (int i = 0; i < 85; i++) {
             Post post = new Post();
             post.setTitle("Another post #" + i);
-            postService.create(post);
+            postAction.create(post);
         }
 
-        List<Post> posts;
 
         // check first page
-        posts = postService.find(0, 10);
-        assertEquals(10, posts.size());
-        assertEquals("Another post #0", posts.get(0).getTitle());
-        assertEquals("Another post #8", posts.get(8).getTitle());
+        Page<Post> posts = postAction.find(0, 10);
+        assertEquals(10, posts.getContent().size());
+        assertEquals("Another post #0", posts.getContent().get(0).getTitle());
+        assertEquals("Another post #8", posts.getContent().get(8).getTitle());
 
         // check last page
-        posts = postService.find(80, 10);
-        assertEquals(5, posts.size());
-        assertEquals("Another post #80", posts.get(0).getTitle());
+        posts = postAction.find(8, 10);
+        assertEquals(5, posts.getContent().size());
+        assertEquals("Another post #80", posts.getContent().get(0).getTitle());
 
     }
 }
