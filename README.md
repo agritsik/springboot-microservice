@@ -19,6 +19,7 @@ The main purpose of this project is demonstrating how to:
 4. Messaging system using spring-amqp and rabbitmq
 5. Testing using mockito, spring-tests
 6. Virtualization using docker (TBD)
+7. CI process using Travis CI
 
 ## Testing strategies
 
