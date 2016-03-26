@@ -80,8 +80,8 @@ public class PostComponentTest {
 
 
         // check repo
-        Long id = Long.valueOf(TestContext.createdLocationString.substring(TestContext.createdLocationString.length() - 1));
-        Post post = postRepository.findOne(id);
+        TestContext.createdId = Long.valueOf(TestContext.createdLocationString.substring(TestContext.createdLocationString.length() - 1));
+        Post post = postRepository.findOne(TestContext.createdId);
         assertNotNull(post);
         assertEquals(TITLE, post.getTitle());
 
@@ -105,12 +105,22 @@ public class PostComponentTest {
     public void test3Update() throws Exception {
 
         // arrange
-        String postJson = new ObjectMapper().writeValueAsString(new Post(1, TITLE_EDITED));
+
+        Post post = new Post(TestContext.createdId, TITLE_EDITED);
+        String postJson = new ObjectMapper().writeValueAsString(post);
 
         // act && assert
         this.mvc.perform(put(TestContext.createdLocationString).content(postJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(""));
+
+        // check repo
+        Post savedPost = postRepository.findOne(TestContext.createdId);
+        assertEquals(TITLE_EDITED, savedPost.getTitle());
+
+        // check bus
+        Object message = rabbitTemplate.receiveAndConvert(Application.QUEUE_NAME);
+        assertEquals(TITLE_EDITED, message.toString());
 
     }
 

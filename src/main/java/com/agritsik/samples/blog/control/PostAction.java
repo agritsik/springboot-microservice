@@ -21,11 +21,7 @@ public class PostAction {
     RabbitTemplate rabbitTemplate;
 
     public void create(Post post) {
-
-        System.out.println("Service creates...");
         postRepository.save(post);
-
-        System.out.println("AMQP sending");
         rabbitTemplate.convertAndSend(Application.QUEUE_NAME, post.getTitle());
     }
 
@@ -38,7 +34,9 @@ public class PostAction {
     }
 
     public Post update(Post post) {
-        return postRepository.save(post);
+        Post savedPost = postRepository.save(post);
+        rabbitTemplate.convertAndSend(Application.QUEUE_NAME, post.getTitle());
+        return savedPost;
     }
 
     public void delete(long id) {

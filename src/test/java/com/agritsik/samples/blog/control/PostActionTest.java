@@ -80,7 +80,7 @@ public class PostActionTest {
 
         // assert
         verify(postRepository).save(post);
-        verifyZeroInteractions(rabbitTemplate);
+        verify(rabbitTemplate).convertAndSend(Application.QUEUE_NAME, post.getTitle());
 
     }
 
