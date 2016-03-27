@@ -10,6 +10,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Repository
 @Transactional // todo: why is it mandatory for spring?
 public class PostAction {
@@ -43,4 +45,7 @@ public class PostAction {
         postRepository.delete(id);
     }
 
+    public List<Post> findByTitle(String name) {
+        return postRepository.findByTitle(name);
+    }
 }

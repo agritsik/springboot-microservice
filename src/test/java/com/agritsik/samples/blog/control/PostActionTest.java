@@ -11,6 +11,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.PageRequest;
 
+import java.util.List;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -67,6 +69,22 @@ public class PostActionTest {
         // assert
         verify(postRepository).findAll(any(PageRequest.class));
         verifyZeroInteractions(rabbitTemplate);
+    }
+
+    @Test
+    public void testByName() throws Exception {
+
+        // arrange
+        String name = "requested name";
+
+        // act
+        List<Post> posts = postAction.findByTitle(name);
+
+        // assert
+        verify(postRepository).findByTitle(name);
+        verifyZeroInteractions(rabbitTemplate);
+
+
     }
 
     @Test
