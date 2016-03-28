@@ -2,8 +2,10 @@ package component;
 
 
 import com.agritsik.samples.blog.Application;
+import com.agritsik.samples.blog.TestConfiguration;
 import com.agritsik.samples.blog.TestContext;
 import com.agritsik.samples.blog.boundary.PostRepository;
+import com.agritsik.samples.blog.boundary.PostRestClient;
 import com.agritsik.samples.blog.entity.Post;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
@@ -32,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(Application.class)
+@SpringApplicationConfiguration(classes = {Application.class, TestConfiguration.class})
 @WebAppConfiguration
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class PostComponentTest {
@@ -51,6 +53,9 @@ public class PostComponentTest {
 
     @Autowired
     RabbitAdmin rabbitAdmin;
+
+    @Autowired
+    PostRestClient postRestClient;
 
 
     private MockMvc mvc;
@@ -88,6 +93,9 @@ public class PostComponentTest {
         // check bus
         Object message = rabbitTemplate.receiveAndConvert(Application.QUEUE_NAME);
         assertEquals(TITLE, message.toString());
+
+        Post post1 = postRestClient.getPost(1);
+        assertEquals("yep", post1.getTitle());
 
     }
 

@@ -21,7 +21,8 @@ public class PostRestClientIntegrationTest {
     public void testGetPost() throws Exception {
 
         // arrange
-        String title = "sunt aut facere repellat provident occaecati excepturi optio reprehenderit";
+//        String title = "sunt aut facere repellat provident occaecati excepturi optio reprehenderit";
+        String title = "yep";
 
         // act
         Post post = postRestClient.getPost(1);
