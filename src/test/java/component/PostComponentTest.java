@@ -2,7 +2,7 @@ package component;
 
 
 import com.agritsik.samples.blog.Application;
-import com.agritsik.samples.blog.TestConfiguration;
+import com.agritsik.samples.blog.MockedConfiguration;
 import com.agritsik.samples.blog.TestContext;
 import com.agritsik.samples.blog.boundary.PostRepository;
 import com.agritsik.samples.blog.boundary.PostRestClient;
@@ -18,6 +18,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -34,9 +35,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {Application.class, TestConfiguration.class})
+@SpringApplicationConfiguration(classes = {Application.class, MockedConfiguration.class})
 @WebAppConfiguration
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@ActiveProfiles("mocked")
 public class PostComponentTest {
 
     public static final String TITLE = "1st";
