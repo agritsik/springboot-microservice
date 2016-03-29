@@ -14,7 +14,6 @@ import static org.mockito.Mockito.when;
 @Profile("mock")
 public class MockedConfiguration {
 
-//    @Primary
     @Bean
     public PostRestClient getPostRestClient() {
         PostRestClient mock = Mockito.mock(PostRestClient.class);
