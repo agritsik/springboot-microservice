@@ -2,6 +2,7 @@ package com.agritsik.samples.blog.control;
 
 import com.agritsik.samples.blog.Application;
 import com.agritsik.samples.blog.boundary.PostRepository;
+import com.agritsik.samples.blog.boundary.PostRestClient;
 import com.agritsik.samples.blog.entity.Post;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import java.util.List;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
@@ -30,6 +32,9 @@ public class PostActionTest {
     @Mock
     RabbitTemplate rabbitTemplate;
 
+    @Mock
+    PostRestClient postRestClient;
+
     @Test
     public void testCreate() throws Exception {
 
@@ -42,7 +47,7 @@ public class PostActionTest {
         // assert
         verify(postRepository).save(post);
         verify(rabbitTemplate).convertAndSend(Application.QUEUE_NAME, post.getTitle());
-
+        verify(postRestClient).getPost(anyLong());
     }
 
     @Test

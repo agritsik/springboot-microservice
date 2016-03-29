@@ -2,6 +2,7 @@ package com.agritsik.samples.blog.control;
 
 import com.agritsik.samples.blog.Application;
 import com.agritsik.samples.blog.boundary.PostRepository;
+import com.agritsik.samples.blog.boundary.PostRestClient;
 import com.agritsik.samples.blog.entity.Post;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,13 @@ public class PostAction {
     @Autowired
     RabbitTemplate rabbitTemplate;
 
+    @Autowired
+    PostRestClient postRestClient;
+
     public void create(Post post) {
         postRepository.save(post);
         rabbitTemplate.convertAndSend(Application.QUEUE_NAME, post.getTitle());
+        postRestClient.getPost(post.getId());
     }
 
     public Post find(long id) {

@@ -1,5 +1,7 @@
-package com.agritsik.samples.blog;
+package spring;
 
+import com.agritsik.samples.blog.Application;
+import com.agritsik.samples.blog.MockedConfiguration;
 import com.agritsik.samples.blog.boundary.PostRestClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {Application.class, MockedConfiguration.class})
 @ActiveProfiles("mock")
-public class SpringProfilesTest {
+public class SpringMockProfilesTest {
 
     @Autowired
     PostRestClient postRestClient;
