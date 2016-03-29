@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringApplicationConfiguration(classes = {Application.class, MockedConfiguration.class})
 @WebAppConfiguration
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-@ActiveProfiles("mocked")
+@ActiveProfiles("mock")
 public class PostComponentTest {
 
     public static final String TITLE = "1st";

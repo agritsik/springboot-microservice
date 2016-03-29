@@ -5,17 +5,16 @@ import com.agritsik.samples.blog.entity.Post;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @Configuration
-@Profile("mocked")
+@Profile("mock")
 public class MockedConfiguration {
 
-    @Primary
+//    @Primary
     @Bean
     public PostRestClient getPostRestClient() {
         PostRestClient mock = Mockito.mock(PostRestClient.class);

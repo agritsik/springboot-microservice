@@ -11,19 +11,17 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(Application.class)
-
+@SpringApplicationConfiguration(classes = {Application.class})
 public class PostRestClientIntegrationTest {
 
-
-    @Autowired PostRestClient postRestClient;
+    @Autowired
+    PostRestClient postRestClient;
 
     @Test
     public void testGetPost() throws Exception {
 
         // arrange
         String title = "sunt aut facere repellat provident occaecati excepturi optio reprehenderit";
-//        String title = "yep";
 
         // act
         Post post = postRestClient.getPost(1);
