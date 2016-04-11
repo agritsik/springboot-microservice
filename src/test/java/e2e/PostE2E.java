@@ -5,6 +5,7 @@ import com.agritsik.samples.blog.TestContext;
 import com.agritsik.samples.blog.entity.Post;
 import junit.framework.TestCase;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
+@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(Application.class)
 @WebIntegrationTest
